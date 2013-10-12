@@ -1,0 +1,11 @@
+# Build and Release Folders
+bin/
+lib/
+out/
+build
+
+#visual studio shit
+*.vcxproj
+
+# temp files
+.*~
