@@ -68,9 +68,9 @@ struct joint
 	Angle defaultAngleValues[Dim]; /*!< default angle values, in degrees [-360, 360], for joint along x, y, and z (if Dim = 3) axes */
 	Angle maxAngleValues[Dim]; /*!< maximum angle boundaries, in degrees [-360, 360], for joint along x, y, and z (if Dim = 3) axes */
 	Numeric offset[Dim]; /*!< vector indicating the direction and distance of the joint relative to its parent */
-	joint* children[MaxChildren]; /*!< vector indicating the direction and distance of the joint relative to its parent */
-	joint* parent; /*!< vector indicating the direction and distance of the joint relative to its parent */
-	int nbChildren_;
+	joint* children[MaxChildren]; /*!< array indicating the current joint children */
+	int nbChildren_; /*!< number of children connected to the current joint */
+	joint* parent; /*!< pointer to eventual joint parent. Empty if joint is Root. */
 	/*Attributes*/
 };
 

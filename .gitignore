@@ -2,7 +2,9 @@
 bin/
 lib/
 out/
-build
+build/
+latex/
+html/
 
 #cmake stuff
 CMakeFiles/
