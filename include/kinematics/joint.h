@@ -1,5 +1,5 @@
 /**
-* \file Joint.h
+* \file joint.h
 * \brief Description of a 2 or 3 dimensional joint
 * \author Steve T.
 * \version 0.1
@@ -13,16 +13,16 @@
 
 namespace kinematics
 {
-/// \struct Joint
+/// \struct joint
 /// \brief Description of a kinematic joint of dimension Dim (2 or 3). Contains information
 /// about angle limits, as well as eventual parents and children.
 /// if Safe is false, no verification is made on the evaluation of the curve.
 template<typename Numeric=float, typename Angle=Numeric, int Dim=3, int MaxChildren=5, bool Safe=false>
-struct Joint
+struct joint
 {
 	/* Constructors - destructors */
 	///\brief Constructor
-	explicit Joint()
+	explicit joint()
 	: nbChildren_(0)
 	, parent(0)
 	{
@@ -40,7 +40,7 @@ struct Joint
 	}
 	
 	///\brief Destructor
-	~Joint(){};
+	~joint(){};
 	/* Constructors - destructors */
 	
 	/*Operations*/
@@ -48,7 +48,7 @@ struct Joint
 	///  Also sets child parent to current joint.
 	///  \param child the new child
 	///  \param return : the value x(t)
-	void AddChild(Joint* child)
+	void addChild(joint* child)
 	{
 		if(Safe && (nbChildren_ > MaxChildren || child->parent ))
 		{
@@ -68,12 +68,10 @@ struct Joint
 	Angle defaultAngleValues[Dim]; /*!< default angle values, in degrees [-360, 360], for joint along x, y, and z (if Dim = 3) axes */
 	Angle maxAngleValues[Dim]; /*!< maximum angle boundaries, in degrees [-360, 360], for joint along x, y, and z (if Dim = 3) axes */
 	Numeric offset[Dim]; /*!< vector indicating the direction and distance of the joint relative to its parent */
-	Joint* children[MaxChildren]; /*!< vector indicating the direction and distance of the joint relative to its parent */
-	Joint* parent; /*!< vector indicating the direction and distance of the joint relative to its parent */
-	/*Attributes*/
-	
-	private:
+	joint* children[MaxChildren]; /*!< vector indicating the direction and distance of the joint relative to its parent */
+	joint* parent; /*!< vector indicating the direction and distance of the joint relative to its parent */
 	int nbChildren_;
+	/*Attributes*/
 };
 
 }// end namespace kinematics

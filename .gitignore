@@ -4,7 +4,16 @@ lib/
 out/
 build
 
-#visual studio shit
+#cmake stuff
+CMakeFiles/
+src/tests/kinematics/CMakeFiles/
+src/tests/kinematics/MakeFile
+src/tests/kinematics/cmake_install.cmake
+CMakeCache.txt
+MakeFile
+cmake_install.cmake
+
+#visual studio stuff
 *.vcxproj
 
 # temp files
