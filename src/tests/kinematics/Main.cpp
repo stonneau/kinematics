@@ -25,10 +25,14 @@ void JointCreationTest(bool& error)
 void JointSaveTest(bool& error)
 {
 	std:string targetFile("./bin/Robot0.txt");
-	joint_3_t joint;
-	joint_3_t jointChild;
-	joint.addChild(&jointChild);
-	if(!kinematics::WriteTree<joint_3_t,3>(joint, targetFile))
+	joint_3_t j00, j10, j11, j12, j110, j111, j120;
+	j00.addChild(&j10);
+	j00.addChild(&j11);
+	j00.addChild(&j12);
+	j11.addChild(&j110);
+	j11.addChild(&j111);
+	j12.addChild(&j120);
+	if(!kinematics::WriteTree<joint_3_t,3>(j00, targetFile))
 	{
 		std::cout << "In JointSaveTest: can not write file Robot0.txt."<< std::endl;
 		error = true;
