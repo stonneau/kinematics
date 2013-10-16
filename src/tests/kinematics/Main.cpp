@@ -24,7 +24,7 @@ void JointCreationTest(bool& error)
 
 void JointSaveTest(bool& error)
 {
-	std:string targetFile("./bin/Robot0.txt");
+	std::string targetFile("./bin/Robot0.txt");
 	joint_3_t j00, j10, j11, j12, j110, j111, j120;
 	j00.addChild(&j10);
 	j00.addChild(&j11);
