@@ -17,6 +17,8 @@ cmake_install.cmake
 
 #visual studio stuff
 *.vcxproj
+*.sln
+*.filters
 
 # temp files
 .*~

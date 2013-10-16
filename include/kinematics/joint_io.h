@@ -32,10 +32,11 @@
 
 namespace kinematics
 {
-///  \brief Saves a kinematic tree fromed by joints into a text
-///  file.
+///  \brief Recursive function to save joints in a stringstream.
+///	 This method is called by WriteTree and should not be called independantly.
 ///  \param joint the joint to save
-///  \param file the name of the file in which the description must be written.
+///  \param res the stringstream to which the joints must be saved.
+///  \param id reference to the current id number associated to the joint.
 template<class T, int Dim>
 void WriteTreeRec(const T& joint, std::stringstream& res, unsigned int& id)
 {
@@ -73,7 +74,7 @@ void WriteTreeRec(const T& joint, std::stringstream& res, unsigned int& id)
 ///  \brief Saves a kinematic tree formed by joints into a text
 ///  file.
 ///  \param joint the root joint of the kinematic tree to save
-///  \param file the name of the file in which the description must be written.
+///  \param filename the name of the file in which the description must be written.
 template<class T, int Dim>
 bool WriteTree(const T& joint, const std::string& filename)
 {
