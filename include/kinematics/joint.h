@@ -31,7 +31,7 @@ struct joint
 			minAngleValues[i] = -360;
 			maxAngleValues[i] = 360;
 			defaultAngleValues[i] = 0;
-			offset[i]=0;
+			offset[i] = 0;
 		}
 		for(unsigned int i = 0; i<MaxChildren; ++i)
 		{
@@ -48,7 +48,7 @@ struct joint
 	///  Also sets child parent to current joint.
 	///  \param child the new child
 	///  \param return : the value x(t)
-	void addChild(joint* child)
+	void add_child(joint* child)
 	{
 		if(Safe && (nbChildren_ > MaxChildren || child->parent ))
 		{

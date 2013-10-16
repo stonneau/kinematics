@@ -29,14 +29,11 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <vector>
+#include <exception>
 
 namespace kinematics
 {
-///  \brief Recursive function to save joints in a stringstream.
-///	 This method is called by WriteTree and should not be called independantly.
-///  \param joint the joint to save
-///  \param res the stringstream to which the joints must be saved.
-///  \param id reference to the current id number associated to the joint.
 template<class T, int Dim>
 void WriteTreeRec(const T& joint, std::stringstream& res, unsigned int& id)
 {
@@ -73,9 +70,10 @@ void WriteTreeRec(const T& joint, std::stringstream& res, unsigned int& id)
 		
 ///  \brief Saves a kinematic tree formed by joints into a text
 ///  file.
+///	 If Safe is set to true, an exception will be thrown if it is not possible to create the file.
 ///  \param joint the root joint of the kinematic tree to save
 ///  \param filename the name of the file in which the description must be written.
-template<class T, int Dim>
+template<class T, int Dim, bool Safe>
 bool WriteTree(const T& joint, const std::string& filename)
 {
 	unsigned int id =0;
@@ -89,7 +87,158 @@ bool WriteTree(const T& joint, const std::string& filename)
 		myfile.close();
 		return true;
 	}
+	else if(Safe)
+	{
+		std::string errMess("Unable to create file " + filename);
+		throw exception(errMess.c_str());
+	}
 	return false;
 }
+
+template<typename Numeric, int Dim, bool Safe>
+void ReadLine(const std::string& line, Numeric* values)
+{
+	char str[20];
+	float x, y;
+	if(Dim == 3)
+	{
+		float z;
+		sscanf(line.c_str(),"%s %f %f %f", str, &x, &y, &z);
+		values[0] = x;
+		values[1] = y;
+		values[2] = z;
+	}
+	else if(Dim == 2)
+	{
+		sscanf(line.c_str(),"%s %f %f",str, &x, &y);
+		values[0] = x;
+		values[1] = y;
+	}
+}
+
+template<typename T, typename Numeric, typename Angle, int Dim, int MaxChildren, bool Safe>
+void ReadJoint(std::ifstream& myfile, std::vector<T>& joints, std::vector<std::vector<int>>& children, int id, bool isRoot)
+{
+	T res;
+	std::string line;
+	bool offset(false), minAngle(false), maxAngle(false), defaultAngle(false), parent(isRoot);
+	bool all(false);
+	while(myfile.good() &! all)
+	{
+		getline (myfile, line);
+		if(line.find("PARENT") == 0)
+		{
+			if(parent && Safe) throw std::exception("wrong tree definition: attribute PARENT redefinition, or joint is ROOT");
+			parent = true;
+			char str[20];
+			int parentId; sscanf(line.c_str(),"%s %*s %d", str, &parentId);
+			children[parentId].push_back(id);
+		}
+		if(line.find("OFFSET") == 0)
+		{
+			if(offset && Safe) throw std::exception("wrong tree definition: attribute OFFSET redefinition");
+			offset = true;
+			ReadLine<Numeric, Dim, Safe>(line, res.offset);
+		}
+		if(line.find("MINANGLES") == 0)
+		{
+			if(minAngle && Safe) throw std::exception("wrong tree definition: attribute MINANGLES redefinition");
+			minAngle = true;
+			ReadLine<Numeric, Dim, Safe>(line, res.minAngleValues);
+		}
+		if(line.find("MAXANGLES") == 0)
+		{
+			if(maxAngle && Safe) throw std::exception("wrong tree definition: attribute MAXANGLES redefinition)");
+			maxAngle = true;
+			ReadLine<Numeric, Dim, Safe>(line, res.maxAngleValues);
+		}
+		if(line.find("DEFAULTANGLES") == 0)
+		{
+			if(defaultAngle && Safe) throw std::exception("wrong tree definition: attribute DEFAULTANGLES redefinition ");
+			defaultAngle = true;
+			ReadLine<Numeric, Dim, Safe>(line, res.defaultAngleValues);
+		}
+		all = offset && minAngle && maxAngle && defaultAngle && parent;
+	}
+	if(all)
+	{
+		joints[id] = res;
+	}
+	else if(Safe)
+	{
+		throw std::exception("wrong tree definition: EOF reached before complete definition");
+	}
+}
+
+template<typename T>
+void ConnectJoint(T* joint, int id, const std::vector<T>& joints, const std::vector<std::vector<int>>& children)
+{
+	std::vector<int> childrenIds = children[id];
+	for(std::vector<int>::const_iterator it = childrenIds.begin(); it != childrenIds.end(); ++it)
+	{
+		int index = (*it);
+		T* child = new T(joints[index]);
+		ConnectJoint(child, index, joints, children);
+		joint->add_child(child);
+	}
+}
+
+///  \brief Loads a kinematic tree from a given file.
+///  If Safe is set to true, this method will throw an exception if the file can not be read.
+///  \param filename the name of the file from which the description must be loaded.
+template<typename Numeric, typename Angle, int Dim, int MaxChildren, bool Safe>
+joint<Numeric, Angle, Dim, MaxChildren, Safe>* ReadTree(const std::string& filename)
+{
+	typedef joint<Numeric, Angle, Dim, MaxChildren, Safe> joint_t;
+	string line;
+	ifstream myfile (filename);
+	int rootId = -1; bool rootFound(false);
+	std::vector<joint_t> joints(100);
+	std::vector<std::vector<int>> children(100);
+	if (myfile.is_open())
+	{
+		while ( myfile.good() )
+		{
+			getline (myfile, line);
+			if(line.find("ROOT") == 0 || line.find("JOINT") == 0)
+			{
+				char str[20];
+				int id; sscanf(line.c_str(),"%s %*s %d", str, &id);
+				bool isRoot = (line.find("ROOT") == 0);
+				if(isRoot)
+				{
+					if(rootFound && Safe)
+					{
+						throw std::exception("wrong tree definition: Multiple ROOT definition");
+					}
+					rootId = id;
+					rootFound = true;
+				}
+				ReadJoint<joint_t, Numeric, Angle, Dim, MaxChildren, Safe>(myfile, joints, children, id, isRoot);
+			}
+		}
+		myfile.close();
+	}
+	else if(Safe)
+	{
+		std::string errMess("Unable to open file " + filename + "for reading.");
+		throw std::exception(errMess.c_str());
+	}
+	else
+	{
+		return 0;
+	}
+	if(rootFound)
+	{
+		joint_t* root = new joint_t(joints[rootId]);
+		ConnectJoint(root, rootId, joints, children);
+		return root;
+	}
+	else if(Safe)
+	{
+		throw std::exception("wrong tree definition: No ROOT definition");
+	}
+}
+
 }// end namespace kinematics
 #endif //_STRUCT_JOINT_IO
