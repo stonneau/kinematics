@@ -26,14 +26,14 @@ struct joint
 	: nbChildren_(0)
 	, parent(0)
 	{
-		for(unsigned int i = 0; i<Dim; ++i)
+		for(unsigned int i = 0; i < Dim; ++i)
 		{
 			minAngleValues[i] = -360;
 			maxAngleValues[i] = 360;
 			defaultAngleValues[i] = 0;
 			offset[i] = 0;
 		}
-		for(unsigned int i = 0; i<MaxChildren; ++i)
+		for(unsigned int i = 0; i < MaxChildren; ++i)
 		{
 			children[i] = 0;
 		}
@@ -41,6 +41,16 @@ struct joint
 	
 	///\brief Destructor
 	~joint(){};
+
+	///\brief deletes joint children, then the joint itself
+	void free()
+	{
+		for(unsigned int i = 0; i < nbChildren_; ++i)
+		{
+			children[i]->free();
+		}
+		delete this;
+	}
 	/* Constructors - destructors */
 	
 	/*Operations*/

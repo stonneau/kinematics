@@ -34,6 +34,7 @@
 
 namespace kinematics
 {
+//! @cond
 template<class T, int Dim>
 void WriteTreeRec(const T& joint, std::stringstream& res, unsigned int& id)
 {
@@ -67,6 +68,7 @@ void WriteTreeRec(const T& joint, std::stringstream& res, unsigned int& id)
 		WriteTreeRec<T, Dim>(*(joint.children[i]), res, id);
 	}
 }
+/// @endcond
 		
 ///  \brief Saves a kinematic tree formed by joints into a text
 ///  file.
@@ -81,7 +83,7 @@ bool WriteTree(const T& joint, const std::string& filename)
 	WriteTreeRec<T, Dim>(joint, res, id);	
 	std::ofstream myfile;
 	myfile.open (filename.c_str());
-	if (myfile.is_open())
+	if(myfile.is_open())
 	{
 		myfile << res.rdbuf();
 		myfile.close();
@@ -95,6 +97,7 @@ bool WriteTree(const T& joint, const std::string& filename)
 	return false;
 }
 
+//! @cond
 template<typename Numeric, int Dim, bool Safe>
 void ReadLine(const std::string& line, Numeric* values)
 {
@@ -125,7 +128,7 @@ void ReadJoint(std::ifstream& myfile, std::vector<T>& joints, std::vector<std::v
 	bool all(false);
 	while(myfile.good() &! all)
 	{
-		getline (myfile, line);
+		getline(myfile, line);
 		if(line.find("PARENT") == 0)
 		{
 			if(parent && Safe) throw std::exception("wrong tree definition: attribute PARENT redefinition, or joint is ROOT");
@@ -182,6 +185,7 @@ void ConnectJoint(T* joint, int id, const std::vector<T>& joints, const std::vec
 		joint->add_child(child);
 	}
 }
+/// @endcond
 
 ///  \brief Loads a kinematic tree from a given file.
 ///  If Safe is set to true, this method will throw an exception if the file can not be read.

@@ -84,8 +84,8 @@ void JointLoadTest(bool& error)
 	if(!(remove(comparedFile.c_str()) == 0))
 	{
 		error = true;
-		std::cout << "In JointSaveTest: can not remove RobotLoad.txt."<< std::endl;
-	}	
+		std::cout << "In JointLoadTest: can not remove RobotLoad.txt."<< std::endl;
+	}
 }
 
 int main(int argc, char *argv[])
