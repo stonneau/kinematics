@@ -23,8 +23,8 @@ bool CompareFiles(const std::string& filename1, const std::string& filename2)
 {
 	FILE *fp1, *fp2;
     int ch1, ch2;
-    fopen_s(&fp1, filename1.c_str(), "r");
-    fopen_s(&fp2, filename2.c_str(), "r") ;
+    fp1 = fopen(filename1.c_str(), "r");
+    fp2 = fopen(filename2.c_str(), "r") ;
 	if(fp1 == 0)
 	{
 		std::cout << "Cannot open " << filename1 << "for reading "<< std::endl;
